@@ -5,6 +5,7 @@ import org.scalatra.json._
 import org.json4s.JsonAST._
 import org.json4s.{DefaultFormats, Formats}
 import slick.jdbc.JdbcBackend.Database
+import org.scalatra.CorsSupport
 
 import com.cicroomapi.models.UserModel
 
@@ -14,13 +15,24 @@ case class User(username: String, email: String, password: String) {
   def listParams = (username, email, password)
 }
 
-class UsersController(val db: Database) extends ScalatraServlet  with JacksonJsonSupport{
+class UsersController(val db: Database) extends ScalatraServlet  
+                                        with JacksonJsonSupport
+                                        with CorsSupport {
+
+  options("/*") {
+    response.setHeader(
+      "Access-Control-Allow-Headers", request.getHeader("Access-Control-Request-Headers")
+    )
+    response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"))
+    response.setHeader("Access-Control-Allow-Methods", request.getHeader("POST"))
+  }
 
   protected implicit lazy val jsonFormats: Formats = DefaultFormats
   
   post("/") {
     val user = parsedBody.extract[User]
     UserModel.create(user.listParams)
+    response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"))
     Response("ok")
   }
 
