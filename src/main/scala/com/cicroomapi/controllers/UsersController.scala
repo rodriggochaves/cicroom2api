@@ -29,9 +29,9 @@ class UsersController(val db: Database) extends ScalatraServlet
 
   protected implicit lazy val jsonFormats: Formats = DefaultFormats
   
-  post("/") {
-    val user = parsedBody.extract[User]
-    UserModel.create(user.listParams)
+  post("/") { 
+    val parameters = parsedBody.extract[Map[String, User]]
+    UserModel.create(parameters("user").listParams)
     response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"))
     Response("ok")
   }
