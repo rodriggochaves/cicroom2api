@@ -8,12 +8,23 @@ import slick.jdbc.JdbcBackend.Database
 import org.scalatra.CorsSupport
 
 import com.cicroomapi.models.UserModel
+import com.cicroomapi.models.TableSchema
+import com.cicroomapi.models.UsersTable
+import slick.driver.PostgresDriver.api._
+import slick.dbio.DBIOAction
+
 
 case class Response(status: String)
 
-case class User(username: String, email: String, password: String) {
-  def listParams = (username, email, password)
+case class User(username: String, email: String, password: String, role:Int) {
+  def listParams = (username, email, password,role)
 }
+
+case class UserAuth(email:String,password:String){
+  def getEmail = (email)
+  def getPassword = (password)
+}
+
 
 class UsersController(val db: Database) extends ScalatraServlet  
                                         with JacksonJsonSupport
@@ -34,6 +45,13 @@ class UsersController(val db: Database) extends ScalatraServlet
     UserModel.create(parameters("user").listParams)
     response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"))
     Response("ok")
-  }
+  } 
+
+  // post("/auth"){
+  //   val parameters = parsedBody.extract[Map[String,UserAuth]]
+  //   UserModel.select(parameters("UserAuth").getEmail)
+  //   response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"))
+  //   Response("ok")
+  // }
 
 }
