@@ -8,7 +8,8 @@ object UserModel {
 
   val users = TableQuery[UsersTable]
 
-  def create( list: (String, String, String)  ) = {
-    db.run( users.map( c => (c.username, c.email, c.digest_password) ) += list )
+  def create( list: (String, String, String,Int)  ) = {
+    db.run( users.map( c => (c.username, c.email, c.digest_password, c.role) ) += list )
   }
+
 }
