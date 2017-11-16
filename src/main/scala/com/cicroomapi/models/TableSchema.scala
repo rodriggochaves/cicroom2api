@@ -6,10 +6,10 @@ import slick.driver.PostgresDriver.api._
 object TableSchema {
   
   val rooms = TableQuery[RoomsTable]
-  val users = TableQuery[UsersTable]
   val roles = TableQuery[RolesTable]
+  val users = TableQuery[UsersTable]
 
-  val schema = rooms.schema ++ users.schema ++ roles.schema
+  val schema = rooms.schema ++ roles.schema ++ users.schema
 
   val dropSchemaAction = schema.drop
   val createSchemaAction = schema.create
