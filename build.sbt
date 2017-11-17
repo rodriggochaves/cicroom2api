@@ -21,7 +21,9 @@ libraryDependencies ++= Seq(
   "org.postgresql" % "postgresql" % "9.3-1100-jdbc4",
   "com.mchange" % "c3p0" % "0.9.5.2",
   "org.json4s" %% "json4s-jackson" % "3.5.3",
-  "com.google.code.gson" % "gson" % "2.8.2"
+  "com.google.code.gson" % "gson" % "2.8.2",
+  "com.typesafe.akka" %% "akka-actor" % "2.4.12",
+  "net.databinder.dispatch" %% "dispatch-core" % "0.12.0",
 )
 
 enablePlugins(SbtTwirl)

@@ -6,6 +6,13 @@ import org.json4s.JsonAST._
 import org.json4s.{DefaultFormats, Formats}
 import slick.jdbc.JdbcBackend.Database
 import org.scalatra.CorsSupport
+import org.scalatra.FutureSupport
+
+// async libs
+import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.util.{Failure, Success, Try}
+import _root_.akka.actor.ActorSystem
+import dispatch._
 
 import com.cicroomapi.models.UserModel
 
@@ -15,10 +22,15 @@ case class User(username: String, email: String, password: String) {
   def listParams = (username, email, password)
 }
 
-class UsersController(val db: Database) extends ScalatraServlet  
+class UsersController(val db: Database, val system: ActorSystem) extends ScalatraServlet  
                                         with JacksonJsonSupport
-                                        with CorsSupport {
+                                                                 with CorsSupport
+                                                                 with FutureSupport {
 
+  protected implicit def executor: ExecutionContext = system.dispatcher
+
+  protected implicit lazy val jsonFormats: Formats = DefaultFormats
+  
   options("/*") {
     response.setHeader(
       "Access-Control-Allow-Headers", request.getHeader("Access-Control-Request-Headers")
