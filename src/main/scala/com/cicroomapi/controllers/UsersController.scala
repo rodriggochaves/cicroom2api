@@ -23,7 +23,7 @@ case class User(username: String, email: String, password: String) {
 }
 
 class UsersController(val db: Database, val system: ActorSystem) extends ScalatraServlet  
-                                        with JacksonJsonSupport
+                                                                 with JacksonJsonSupport
                                                                  with CorsSupport
                                                                  with FutureSupport {
 
@@ -39,13 +39,16 @@ class UsersController(val db: Database, val system: ActorSystem) extends Scalatr
     response.setHeader("Access-Control-Allow-Methods", request.getHeader("POST"))
   }
 
-  protected implicit lazy val jsonFormats: Formats = DefaultFormats
   
-  post("/") { 
+  post("/") {
     val parameters = parsedBody.extract[Map[String, User]]
-    UserModel.create(parameters("user").listParams)
-    response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"))
-    Response("ok")
+    response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin") )
+    new AsyncResult { 
+      val is: Future[_] = UserModel.create(parameters("user").listParams).fold(
+        _ => Response("Error"),
+        _ => Response("ok")
+      )
+    }
   }
 
 }
