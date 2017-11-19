@@ -49,9 +49,12 @@ class UsersController(val db: Database) extends ScalatraServlet
 
   // post("/auth"){
   //   val parameters = parsedBody.extract[Map[String,UserAuth]]
-  //   UserModel.select(parameters("UserAuth").getEmail)
   //   response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"))
   //   Response("ok")
   // }
+
+  get("/select"){
+    val q1 = TableSchema.roles.filter(p => p.description === "Aluno") .delete
+  }
 
 }
