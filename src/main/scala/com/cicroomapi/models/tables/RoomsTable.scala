@@ -1,4 +1,4 @@
-package com.cicroomapi.models
+package com.cicroomapi.models.tables
 
 import org.scalatra._
 import slick.driver.PostgresDriver.api._
