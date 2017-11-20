@@ -18,7 +18,7 @@ import com.cicroomapi.models.UserModel
 
 case class Response(status: String)
 
-case class User(username: String, email: String, password: String) {
+case class UserParams(username: String, email: String, password: String) {
   def listParams = (username, email, password)
 }
 
@@ -41,7 +41,7 @@ class UsersController(val db: Database, val system: ActorSystem) extends Scalatr
 
   
   post("/") {
-    val parameters = parsedBody.extract[Map[String, User]]
+    val parameters = parsedBody.extract[Map[String, UserParams]]
     response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin") )
     new AsyncResult { 
       val is: Future[_] = UserModel.create(parameters("user").listParams).fold(
