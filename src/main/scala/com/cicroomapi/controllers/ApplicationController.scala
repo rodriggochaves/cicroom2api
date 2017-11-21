@@ -5,7 +5,7 @@ import slick.driver.PostgresDriver.api._
 import org.json4s.{DefaultFormats, Formats}
 import org.scalatra.json._
 
-import com.cicroomapi.models.TableSchema
+import com.cicroomapi.models.tables.TableSchema
 
 class ApplicationController(val db: Database) extends ScalatraServlet 
                                               with JacksonJsonSupport {
