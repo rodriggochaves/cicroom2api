@@ -1,7 +1,7 @@
 package com.cicroomapi.models
 
 import slick.driver.PostgresDriver.api._
-
+import com.cicroomapi.models.tables.RolesTable
 object RoleModel {
   
   val db = DatabaseConnection.db

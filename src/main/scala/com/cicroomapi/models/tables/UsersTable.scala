@@ -4,7 +4,7 @@ import org.scalatra._
 import slick.driver.PostgresDriver.api._
 import slick.lifted.ProvenShape
 
-case class User(id: Option[Int], username: Option[String], email: Option[String], digest_password: Option[String], role_id:Int)
+case class User(id: Option[Int], username: Option[String], email: Option[String], digest_password: Option[String], roleId: Option[Int])
 
 class UsersTable(tag: Tag) extends Table[User](tag, "users") {
   
@@ -12,7 +12,8 @@ class UsersTable(tag: Tag) extends Table[User](tag, "users") {
   def username = column[String]("username")
   def email = column[String]("email")
   def digest_password = column[String]("digest_password")
-
-  def * = ( id.?, username.?, email.?, digest_password.? ) <> ( User.tupled, User.unapply )
+  def roleId = column[Int]("role_id")
+  def role = foreignKey("SUP_FK",roleId,TableSchema.roles)(_.id, onUpdate=ForeignKeyAction.Restrict, onDelete=ForeignKeyAction.Cascade)
+  def * = ( id.?, username.?, email.?, digest_password.?, roleId.? ) <> ( User.tupled, User.unapply )
 
 }

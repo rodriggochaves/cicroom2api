@@ -18,8 +18,8 @@ import dispatch._
 // my imports
 import com.cicroomapi.models.UserParams
 import com.cicroomapi.models.UserModel
-import com.cicroomapi.models.TableSchema
-import com.cicroomapi.models.UsersTable
+import com.cicroomapi.models.tables.TableSchema
+import com.cicroomapi.models.tables.UsersTable
 import slick.driver.PostgresDriver.api._
 import slick.dbio.DBIOAction
 

@@ -2,7 +2,10 @@ package com.cicroomapi.models.tables
 
 import org.scalatra._
 import slick.driver.PostgresDriver.api._
-import com.cicroomapi.models
+import com.cicroomapi.models.tables.RoomsTable
+import com.cicroomapi.models.tables.RolesTable
+import com.cicroomapi.models.tables.UsersTable
+import com.cicroomapi.models.RoleModel
 object TableSchema {
   
   val rooms = TableQuery[RoomsTable]
