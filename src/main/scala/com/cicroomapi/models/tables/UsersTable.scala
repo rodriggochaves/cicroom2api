@@ -4,7 +4,7 @@ import org.scalatra._
 import slick.driver.PostgresDriver.api._
 import slick.lifted.ProvenShape
 
-case class User(id: Option[Int], username: Option[String], email: Option[String], digest_password: Option[String])
+case class User(id: Option[Int], username: Option[String], email: Option[String], digest_password: Option[String], role_id:Int)
 
 class UsersTable(tag: Tag) extends Table[User](tag, "users") {
   
