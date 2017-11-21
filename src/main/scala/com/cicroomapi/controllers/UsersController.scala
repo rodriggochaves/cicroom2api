@@ -18,6 +18,11 @@ import dispatch._
 // my imports
 import com.cicroomapi.models.UserParams
 import com.cicroomapi.models.UserModel
+import com.cicroomapi.models.TableSchema
+import com.cicroomapi.models.UsersTable
+import slick.driver.PostgresDriver.api._
+import slick.dbio.DBIOAction
+
 
 class UsersController(val db: Database, val system: ActorSystem) extends ScalatraServlet  
                                                                  with JacksonJsonSupport
@@ -47,5 +52,4 @@ class UsersController(val db: Database, val system: ActorSystem) extends Scalatr
       )
     }
   }
-
 }
