@@ -8,7 +8,7 @@ import com.cicroomapi.models.Cypher
 // my imports
 import com.cicroomapi.models.tables.User
 
-case class UserParams(id: Option[String], username: Option[String], var email: String, password: String, roleId: Int) {
+case class UserParams(id: Option[Int], username: Option[String], email: String, password: String, roleId: Int) {
   def toSave = ( username, email, Cypher.encipher("shh" , password),roleId )
 }
 
