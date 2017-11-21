@@ -1,5 +1,6 @@
 package com.cicroomapi.controllers
 
+// lib import
 import org.scalatra._
 import org.scalatra.json._
 import org.json4s.JsonAST._
@@ -14,13 +15,9 @@ import scala.util.{Failure, Success, Try}
 import _root_.akka.actor.ActorSystem
 import dispatch._
 
+// my imports
+import com.cicroomapi.models.UserParams
 import com.cicroomapi.models.UserModel
-
-case class Response(status: String)
-
-case class UserParams(username: String, email: String, password: String) {
-  def listParams = (username, email, password)
-}
 
 class UsersController(val db: Database, val system: ActorSystem) extends ScalatraServlet  
                                                                  with JacksonJsonSupport
@@ -44,7 +41,7 @@ class UsersController(val db: Database, val system: ActorSystem) extends Scalatr
     val parameters = parsedBody.extract[Map[String, UserParams]]
     response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin") )
     new AsyncResult { 
-      val is: Future[_] = UserModel.create(parameters("user").listParams).fold(
+      val is: Future[_] = UserModel.create(parameters("user")).fold(
         _ => Response("Error"),
         _ => Response("ok")
       )

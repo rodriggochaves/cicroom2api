@@ -2,6 +2,15 @@ package com.cicroomapi.models
 
 import scala.concurrent.Future
 import slick.driver.PostgresDriver.api._
+import com.cicroomapi.models.tables.UsersTable
+import com.cicroomapi.models.Cypher
+
+// my imports
+import com.cicroomapi.models.tables.User
+
+case class UserParams(id: Option[String], username: Option[String], var email: String, password: String) {
+  def toSave = ( username, email, Cypher.encipher("shh" , password) )
+}
 
 object UserModel {
   
@@ -9,7 +18,14 @@ object UserModel {
 
   val users = TableQuery[UsersTable]
 
-  def create( list: (String, String, String)  ): Future[Int] = {
-    db.run( users.map( c => (c.username, c.email, c.digest_password) ) += list )
+  def create( params: UserParams  ): Future[Int] = {
+    db.run( users.map( c => (c.username.?, c.email, c.digest_password) ) += params.toSave )
   }
+
+  def find( email: String ): Future[Option[User]] = {
+    val res = users.filter( _.email === email ).result.headOption
+    res.statements.foreach(println)
+    db.run( res )
+  }
+
 }
