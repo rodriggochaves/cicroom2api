@@ -15,11 +15,21 @@ import _root_.akka.actor.ActorSystem
 import dispatch._
 
 import com.cicroomapi.models.UserModel
+import com.cicroomapi.models.TableSchema
+import com.cicroomapi.models.UsersTable
+import slick.driver.PostgresDriver.api._
+import slick.dbio.DBIOAction
+
 
 case class Response(status: String)
 
-case class User(username: String, email: String, password: String) {
-  def listParams = (username, email, password)
+case class User(username: String, email: String, password: String, role:Int) {
+  def listParams = (username, email, password,role)
+}
+
+case class UserAuth(email:String,password:String){
+  def getEmail = (email)
+  def getPassword = (password)
 }
 
 class UsersController(val db: Database, val system: ActorSystem) extends ScalatraServlet  
@@ -50,5 +60,4 @@ class UsersController(val db: Database, val system: ActorSystem) extends Scalatr
       )
     }
   }
-
 }

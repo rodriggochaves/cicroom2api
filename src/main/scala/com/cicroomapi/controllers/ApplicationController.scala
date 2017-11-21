@@ -19,7 +19,10 @@ class ApplicationController(val db: Database) extends ScalatraServlet
 
   get("/db/create") {
     db.run(TableSchema.createSchemaAction)
+    Thread.sleep(500)
+    TableSchema.createRoles
     "ok"
   }
 
 }
+  
