@@ -24,11 +24,15 @@ import com.cicroomapi.models.tables.TableSchema
 import com.cicroomapi.models.tables.RoomsTable
 import slick.driver.PostgresDriver.api._
 import slick.dbio.DBIOAction
+import _root_.akka.actor.ActorSystem
 
-class RoomsController(val db: Database) extends ScalatraServlet  with JacksonJsonSupport {
+
+class RoomsController(val db: Database, val system: ActorSystem)
+  extends ScalatraServlet with JacksonJsonSupport with FutureSupport {
 
   protected implicit lazy val jsonFormats: Formats = DefaultFormats
-  
+  protected implicit def executor = system.dispatcher
+
   post("/") {
     val parameters = parsedBody.extract[Map[String, RoomParams]]
     println(parameters)
