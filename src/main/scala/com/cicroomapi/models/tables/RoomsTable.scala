@@ -2,11 +2,16 @@ package com.cicroomapi.models.tables
 
 import org.scalatra._
 import slick.driver.PostgresDriver.api._
+import slick.lifted.ProvenShape
 
-class RoomsTable(tag: Tag) extends Table[(Int, String)](tag, "rooms") {
+case class Room(id: Option[Int], description: Option[String], openningTime: Option[String], finalTime: Option[String])
+
+class RoomsTable(tag: Tag) extends Table[Room](tag, "rooms") {
   
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-  def name = column[String]("name")
+  def description = column[String]("description")
+  def openningTime = column[String]("openningTime")
+  def finalTime = column[String]("finalTime")
 
-  def * = (id, name)
+  def * = ( id.?, description.?, openningTime.?, finalTime.? ) <> ( Room.tupled, Room.unapply )
 }
