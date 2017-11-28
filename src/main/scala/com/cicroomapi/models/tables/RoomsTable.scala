@@ -9,7 +9,7 @@ case class Room(id: Option[Int], description: Option[String], openningTime: Opti
 class RoomsTable(tag: Tag) extends Table[Room](tag, "rooms") {
   
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-  def description = column[String]("description")
+  def description = column[String]("description",O.Unique)
   def openningTime = column[String]("openningTime")
   def finalTime = column[String]("finalTime")
 
