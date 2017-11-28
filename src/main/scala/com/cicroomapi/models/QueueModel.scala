@@ -8,8 +8,8 @@ import java.sql.Timestamp
 // my imports
 import com.cicroomapi.models.tables.Queue
 
-case class QueueParams(id: Option[Int], roomId : Int, username: String, timestamp: Option[Timestamp]) {
-    def toSave = ( roomId, username )
+case class QueueParams(id: Option[Int], roomId : Int, username: String, timestamp: Timestamp = new Timestamp(new java.util.Date().getTime())) {
+    def toSave = ( roomId, username, timestamp )
 }
 
 object QueueModel {
@@ -18,7 +18,7 @@ object QueueModel {
   val queue = TableQuery[QueueTable]
 
   def create( params: QueueParams  ): Future[Int] = {
-    val q = queue.map( c => ( c.roomId, c.username ) ) += params.toSave
+    val q = queue.map( c => ( c.roomId, c.username,c.timestamp ) ) += params.toSave
     q.statements.foreach(println)
     db.run( q )
   }
