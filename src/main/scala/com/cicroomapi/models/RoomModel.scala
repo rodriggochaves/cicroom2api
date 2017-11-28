@@ -3,11 +3,12 @@ package com.cicroomapi.models
 import scala.concurrent.Future
 import slick.driver.PostgresDriver.api._
 import com.cicroomapi.models.tables.RoomsTable
-
+import com.cicroomapi.models.tables.TableSchema
+import slick.dbio.DBIOAction._
 // my imports
 import com.cicroomapi.models.tables.Room
 
-case class RoomParams(id: Option[Int], description: Option[String], openningTime: Option[String], finalTime: Option[String], password: Option[String]) {
+case class RoomParams(id: Option[Int], description: Option[String], openningTime: Option[String], finalTime: Option[String], password: Option[String], queueSize: Option[Int]) {
   def toSave = ( description, openningTime, finalTime )
   def getDescription = (description)
 }
@@ -23,9 +24,11 @@ object RoomModel {
   }
 
   def list() = {
-  	val query = rooms.map(r => (r.id.?, r.description.? )).result
-  	query.statements.foreach(println)
-  	db.run(query)    
+  	// val query = rooms.map(r => (r.id.?, r.description.? )).result
+ 	val q2 = sql""" select description,count(*) from rooms join queue on rooms.id = queue.room_id group by description;""".as[(Option[String],Option[Int])]
+  	// query.statements.foreach(println)
+  	q2.statements.foreach(println)
+  	db.run(q2)    
   }
 
 }
