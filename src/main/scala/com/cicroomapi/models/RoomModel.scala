@@ -7,7 +7,7 @@ import com.cicroomapi.models.tables.RoomsTable
 // my imports
 import com.cicroomapi.models.tables.Room
 
-case class RoomParams(id: Option[Int], description: Option[String], openningTime: Option[String], finalTime: Option[String], password: String) {
+case class RoomParams(id: Option[Int], description: Option[String], openningTime: Option[String], finalTime: Option[String], password: Option[String]) {
   def toSave = ( description, openningTime, finalTime )
   def getDescription = (description)
 }
@@ -17,8 +17,8 @@ object RoomModel {
   val rooms = TableQuery[RoomsTable]
 
   def create( params: RoomParams): Future[Int] = {
-  val query = rooms.map( r => (r.description.?, r.openningTime.?, r.finalTime.?) ) += params.toSave
-  query.statements.foreach(println)
-  db.run(query)    
+  	val query = rooms.map( r => (r.description.?, r.openningTime.?, r.finalTime.?) ) += params.toSave
+  	query.statements.foreach(println)
+  	db.run(query)    
   }
 }

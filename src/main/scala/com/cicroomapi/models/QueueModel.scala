@@ -5,10 +5,10 @@ import slick.driver.PostgresDriver.api._
 import com.cicroomapi.models.tables.QueueTable
 
 // my imports
-import com.cicroomapi.models.tables.QueueInsert
+import com.cicroomapi.models.tables.Queue
 
-case class QueueParams(id: Option[Int], roomId : Int, username: String, time_stamp: String) {
-    def toSave = ( roomId, username, time_stamp )
+case class QueueParams(id: Option[Int], roomId : Int, username: String, timestamp: String) {
+    def toSave = ( roomId, username, timestamp )
 }
 
 object QueueModel {
@@ -17,7 +17,7 @@ object QueueModel {
   val queue = TableQuery[QueueTable]
 
   def create( params: QueueParams  ): Future[Int] = {
-    val q = queue.map( c => ( c.roomId, c.username, c.time_stamp ) ) += params.toSave
+    val q = queue.map( c => ( c.roomId, c.username, c.timestamp ) ) += params.toSave
     q.statements.foreach(println)
     db.run( q )
   }

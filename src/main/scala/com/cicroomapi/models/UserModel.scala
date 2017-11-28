@@ -8,7 +8,7 @@ import com.cicroomapi.models.Cypher
 // my imports
 import com.cicroomapi.models.tables.User
 
-case class UserParams(id: Option[Int], username: Option[String], email: String, password: String, roleId: Int) {
+case class UserParams(id: Option[Int], username: Option[String], email: String, password: String, roleId: Option[Int]) {
   def toSave = ( username, email, Cypher.encipher("shh" , password),roleId )
 }
 
@@ -19,10 +19,11 @@ object UserModel {
   val users = TableQuery[UsersTable]
 
   def create( params: UserParams  ): Future[Int] = {
-    val q = users.map( c => (c.username.?, c.email, c.digest_password, c.roleId) ) += params.toSave
+    val q = users.map( c => (c.username.?, c.email, c.digest_password, c.roleId.?) ) += params.toSave
     q.statements.foreach(println)
     db.run( q )
   }
+  
   def find( email: String ): Future[Option[User]] = {
     val res = users.filter( _.email === email ).result.headOption
     res.statements.foreach(println)
