@@ -27,6 +27,10 @@ class AuthController(val system: ActorSystem) extends ScalatraServlet
 
   protected implicit lazy val jsonFormats: Formats = DefaultFormats
 
+  before() {
+    contentType = formats("json")
+  }
+
   options("/*") {
     response.setHeader(
       "Access-Control-Allow-Headers", request.getHeader("Access-Control-Request-Headers")

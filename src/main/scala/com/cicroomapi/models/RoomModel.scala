@@ -19,6 +19,13 @@ object RoomModel {
   def create( params: RoomParams): Future[Int] = {
   	val query = rooms.map( r => (r.description.?, r.openningTime.?, r.finalTime.?) ) += params.toSave
   	query.statements.foreach(println)
+  	db.run(query)  
+  }
+
+  def list() = {
+  	val query = rooms.map(r => (r.id.?, r.description.? )).result
+  	query.statements.foreach(println)
   	db.run(query)    
   }
+
 }

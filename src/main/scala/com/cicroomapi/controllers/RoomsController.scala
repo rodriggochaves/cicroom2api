@@ -33,6 +33,10 @@ class RoomsController(val db: Database, val system: ActorSystem)
   protected implicit lazy val jsonFormats: Formats = DefaultFormats
   protected implicit def executor = system.dispatcher
 
+  before() {
+    contentType = formats("json")
+  }
+
   post("/") {
     val parameters = parsedBody.extract[Map[String, RoomParams]]
     println(parameters)
@@ -42,6 +46,16 @@ class RoomsController(val db: Database, val system: ActorSystem)
       val is: Future[_] = RoomModel.create(parameters("room")).fold(
         _ => Response("Error"),
         _ => Response("ok")
+      )
+    }
+  }
+
+  get("/"){
+    response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin") )
+    new AsyncResult{
+      val is: Future[_] = RoomModel.list().fold(
+        _ => ResponseRoom("Error"),
+        rooms => ResponseRoom("ok",rooms)
       )
     }
   }
