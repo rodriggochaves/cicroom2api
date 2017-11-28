@@ -52,9 +52,4 @@ class UsersController(val db: Database, val system: ActorSystem) extends Scalatr
       )
     }
   }
-
-  get("/"){
-    val user = UserModel.find("rodrigo@email.com")
-    user
-  }
 }
