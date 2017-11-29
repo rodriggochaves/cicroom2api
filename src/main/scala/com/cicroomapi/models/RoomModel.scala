@@ -24,8 +24,8 @@ object RoomModel {
   }
 
   def list() = {
-  	// val query = rooms.map(r => (r.id.?, r.description.? )).result
- 	val q2 = sql""" select description,count(*) from rooms join queue on rooms.id = queue.room_id group by description;""".as[(Option[String],Option[Int])]
+  	// val query = (rooms.map(r => (r.id.?, r.description.? )).result).length
+ 	  val q2 = sql""" select description,count(*) from rooms join queue on rooms.id = queue.room_id group by description;""".as[(Option[String],Option[Int])]
   	// query.statements.foreach(println)
   	q2.statements.foreach(println)
   	db.run(q2)    

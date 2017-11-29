@@ -31,4 +31,10 @@ object QueueModel {
     // println(res)
     db.run( res )
   }
+
+  def delete(params: Int) = {
+    val q = queue.filter(_.id === params)
+    val action = q.delete
+    db.run(action)
+  }
 }
