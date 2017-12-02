@@ -31,4 +31,11 @@ object RoomModel {
   	db.run(q2)    
   }
 
+  def delete(params: Int) = {
+    val action = TableSchema.queue.filter(_.roomId === params).delete
+    db.run(action)
+    val query = rooms.filter(_.id === params).delete
+    db.run(query)
+  }
+
 }

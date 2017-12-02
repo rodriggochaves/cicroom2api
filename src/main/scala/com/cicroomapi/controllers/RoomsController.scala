@@ -76,6 +76,16 @@ class RoomsController(val db: Database, val system: ActorSystem)
   delete("/:id"){
     response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin") )
     new AsyncResult{
+      val is: Future[_] = RoomModel.delete(params("id").toInt).fold(
+        _ => Response("Error"),
+        _ => Response("ok")
+      )
+    }
+  }
+
+  delete("/exit/:id"){
+    response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin") )
+    new AsyncResult{
       val is: Future[_] = QueueModel.delete(params("id").toInt).fold(
         _ => Response("Error"),
         _ => Response("ok")
