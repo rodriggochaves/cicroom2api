@@ -26,10 +26,11 @@ object QueueModel {
   }
 
   def find( params: QueueParams ) = {
-    val res = sql""" select queue.room_id,queue.username from queue where queue.room_id = ${params.roomId};""".as[(Option[Int],Option[String])]
-    res.statements.foreach(println)
-    println(res)
-    db.run( res )
+    // val res = sql""" select queue.room_id,count(queue.username) from queue where queue.room_id = ${params.roomId};""".as[(Option[Int],Option[Int])]
+    val query = queue.filter(_.roomId === params.roomId).result 
+    // res.statements.foreach(println)
+    // println(res)
+    db.run( query )
   }
 
   def delete(params: Int) = {

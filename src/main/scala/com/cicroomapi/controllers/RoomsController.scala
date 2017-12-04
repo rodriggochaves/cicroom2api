@@ -67,8 +67,12 @@ class RoomsController(val db: Database, val system: ActorSystem)
     response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin") )
     new AsyncResult{
       val is: Future[_] = QueueModel.create(parameters("user")).fold(
-        _ => ResponseQueue("Error"),
-        room => ResponseQueue("ok",room)
+        _ => Response("Error"),
+        room => {
+          var c = room.length
+          println(s"c = ${c}")
+          ResponseQueue("ok", room(c).roomId, c+1)
+        }
       )
     }
   }
