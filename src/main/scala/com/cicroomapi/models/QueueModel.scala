@@ -19,8 +19,6 @@ object QueueModel {
 
   def create( params: QueueParams  ) = {
     val q = queue.map( c => ( c.roomId, c.username,c.timestamp ) ) += params.toSave
-    q.statements.foreach(println)
-    // println(params)
     db.run( q )
     this.find(params)
   }
