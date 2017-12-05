@@ -10,4 +10,4 @@ case class ViewRoom(id: Option[Int], description: Option[String], relativeQueue:
 
 case class ResponseRoom(status: String, rooms: Vector[ViewRoom])
 
-case class ResponseQueue(status: String, roomId: Int, relative_queue: Int )
+case class ResponseQueue(status: String, roomId: Int, relativeQueue: Int )
