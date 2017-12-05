@@ -83,7 +83,7 @@ class RoomsController(val db: Database, val system: ActorSystem)
           // ResponseQueue("ok", room(0).roomId, c)
           val headers = Map("Access-Control-Allow-Origin" -> "*",
                             "Access-Control-Allow-Headers" -> "*") 
-          Created(ResponseQueue("ok", room(0).roomId, c), headers)
+          Created(ResponseQueue("ok", room(c-1).id, room(0).roomId, c), headers)
         }
       )
     }
