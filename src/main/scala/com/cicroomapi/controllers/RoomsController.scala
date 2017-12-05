@@ -39,6 +39,13 @@ class RoomsController(val db: Database, val system: ActorSystem)
     contentType = formats("json")
   }
 
+  options("/*") {
+    println("recebi um OPTION")
+    response.setHeader("Access-Control-Allow-Headers", "Content-Type")
+    response.setHeader("Access-Control-Allow-Origin", "*")
+    response.setHeader("Access-Control-Allow-Methods", "*")
+  }
+
   post("/") {
     val parameters = parsedBody.extract[Map[String, RoomParams]]
     println(parameters)
@@ -56,22 +63,27 @@ class RoomsController(val db: Database, val system: ActorSystem)
     response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin") )
     new AsyncResult{
       val is: Future[_] = RoomModel.list().fold(
-        _ => ResponseRoom("Error"),
-        rooms => ResponseRoom("ok",rooms)
+        err => println(err),
+        rooms => {
+          val viewRooms = rooms.map( r => ViewRoom(r._1, r._2, r._3) )
+          ResponseRoom("ok", viewRooms )
+        }
       )
     }
   }
 
   post("/enter"){
     val parameters = parsedBody.extract[Map[String, QueueParams]]
-    response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin") )
+    val origin = request.getHeader("Origin")
     new AsyncResult{
       val is: Future[_] = QueueModel.create(parameters("user")).fold(
         _ => Response("Error"),
         room => {
           var c = room.length
-          println(s"c = ${c}")
-          ResponseQueue("ok", room(c).roomId, c+1)
+          // ResponseQueue("ok", room(0).roomId, c)
+          val headers = Map("Access-Control-Allow-Origin" -> "*",
+                            "Access-Control-Allow-Headers" -> "*") 
+          Created(ResponseQueue("ok", room(0).roomId, c), headers)
         }
       )
     }
