@@ -40,7 +40,7 @@ object RoomModel {
   }
 
   def listUsers(params:Int) = {
-    val query = TableSchema.queue.filter(_.roomId === params).result
+    val query = TableSchema.queue.filter(_.roomId === params).sortBy(_.timestamp).result
     db.run(query)
   }
 
