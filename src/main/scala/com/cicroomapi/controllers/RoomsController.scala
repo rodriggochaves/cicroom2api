@@ -43,7 +43,7 @@ class RoomsController(val db: Database, val system: ActorSystem)
     println("recebi um OPTION")
     response.setHeader("Access-Control-Allow-Headers", "Content-Type")
     response.setHeader("Access-Control-Allow-Origin", "*")
-    response.setHeader("Access-Control-Allow-Methods", "*")
+    response.setHeader("Access-Control-Allow-Methods", "POST, DELETE")
   }
 
   post("/") {
@@ -53,8 +53,8 @@ class RoomsController(val db: Database, val system: ActorSystem)
     response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin") )
     new AsyncResult { 
       val is: Future[_] = RoomModel.create(parameters("room")).fold(
-        _ => Response("Error"),
-        _ => Response("ok")
+        err => ErrorResponse("Error", err),
+        roomId => ResponseCreatedRoom(roomId)
       )
     }
   }

@@ -6,7 +6,11 @@ import com.cicroomapi.models.tables.Queue
 
 case class Response(status: String, user: Option[User] = null)
 
+case class ErrorResponse(status: String = "Error", desc: Any = null)
+
 case class ViewRoom(id: Option[Int], description: Option[String], relativeQueue: Option[Int])
+
+case class ResponseCreatedRoom(id: Any)
 
 case class ResponseRoom(status: String, rooms: Vector[ViewRoom])
 
