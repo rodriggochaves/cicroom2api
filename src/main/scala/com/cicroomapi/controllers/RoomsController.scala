@@ -72,6 +72,16 @@ class RoomsController(val db: Database, val system: ActorSystem)
     }
   }
 
+  get("/:id/users"){
+    response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin") )
+    new AsyncResult{
+      val is: Future[_] = RoomModel.listUsers(params("id").toInt).fold(
+        err => println(err),
+        users => ResponseRoomUsers("ok",users)
+      )
+    }
+  }
+
   post("/enter"){
     val parameters = parsedBody.extract[Map[String, QueueParams]]
     val origin = request.getHeader("Origin")

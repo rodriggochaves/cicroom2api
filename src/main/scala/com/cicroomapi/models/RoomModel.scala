@@ -39,6 +39,11 @@ object RoomModel {
   	db.run(q2)    
   }
 
+  def listUsers(params:Int) = {
+    val query = TableSchema.queue.filter(_.roomId === params).result
+    db.run(query)
+  }
+
   def delete(params: Int) = {
     val action = TableSchema.queue.filter(_.roomId === params).delete
     db.run(action)

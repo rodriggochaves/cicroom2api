@@ -15,3 +15,5 @@ case class ResponseCreatedRoom(id: Any)
 case class ResponseRoom(status: String, rooms: Vector[ViewRoom])
 
 case class ResponseQueue(status: String, queueId: Option[Int], roomId: Int, relativeQueue: Int )
+
+case class ResponseRoomUsers(status: String, users: Seq[Queue] = null)
