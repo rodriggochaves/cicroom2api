@@ -41,21 +41,27 @@ class RoomsController(val db: Database, val system: ActorSystem)
 
   options("/*") {
     println("recebi um OPTION")
-    response.setHeader("Access-Control-Allow-Headers", "Content-Type")
+    response.setHeader("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Origin")
     response.setHeader("Access-Control-Allow-Origin", "*")
     response.setHeader("Access-Control-Allow-Methods", "POST, DELETE")
   }
 
   post("/") {
     val parameters = parsedBody.extract[Map[String, RoomParams]]
-    println(parameters)
-    println(parameters("room").getDescription)
     response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin") )
     new AsyncResult { 
-      val is: Future[_] = RoomModel.create(parameters("room")).fold(
-        err => ErrorResponse("Error", err),
-        roomId => ResponseCreatedRoom(roomId)
-      )
+      val is: Future[_] = {
+        RoomModel.create(parameters("room")) match {
+          case Right(x) => {
+            x.fold(
+              err => ErrorResponse("Error", err),
+              room => ResponseCreatedRoom(room)
+            )
+          }
+          case Left(x) => Future{ ErrorResponse("Error", x) }
+        }
+      }
+
     }
   }
 
@@ -85,17 +91,34 @@ class RoomsController(val db: Database, val system: ActorSystem)
   post("/enter"){
     val parameters = parsedBody.extract[Map[String, QueueParams]]
     val origin = request.getHeader("Origin")
+    val headers = Map("Access-Control-Allow-Origin" -> "*",
+                              "Access-Control-Allow-Headers" -> "*") 
     new AsyncResult{
       val is: Future[_] = QueueModel.create(parameters("user")).fold(
         _ => Response("Error"),
-        room => {
-          var c = room.length
-          // ResponseQueue("ok", room(0).roomId, c)
-          val headers = Map("Access-Control-Allow-Origin" -> "*",
-                            "Access-Control-Allow-Headers" -> "*") 
-          Created(ResponseQueue("ok", room(c-1).id, room(0).roomId, c), headers)
+        queue => {
+          QueueModel.findByRoom(queue.roomId).fold(
+            _ => Response("Error"),
+            rooms => Ok(ResponseQueue("ok", queue.id, queue.roomId, rooms.length), headers)
+          )
         }
       )
+    }
+  }
+
+  get("/:roomId/queues/:id") {
+    new AsyncResult {
+      val is: Future[_] = {
+        QueueModel.findByRoom(params("roomId").toInt).fold(
+          _ => Response("Error"),
+          queues => {
+            val headers = Map("Access-Control-Allow-Origin" -> "*",
+                              "Access-Control-Allow-Headers" -> "*") 
+            val queue = queues.indexWhere( q => q.id == Some(params("id").toInt) )
+            Ok(QueuePositionResponse( queue + 1 ), headers)
+          }
+        )
+      }
     }
   }
 

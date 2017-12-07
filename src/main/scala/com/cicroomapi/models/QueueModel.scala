@@ -2,6 +2,7 @@ package com.cicroomapi.models
 
 import scala.concurrent.Future
 import slick.driver.PostgresDriver.api._
+import slick.dbio.Effect.Read
 import com.cicroomapi.models.tables.QueueTable
 import java.sql.Timestamp
 
@@ -10,6 +11,7 @@ import com.cicroomapi.models.tables.Queue
 
 case class QueueParams(id: Option[Int], roomId : Int, username: String, timestamp: Timestamp = new Timestamp(new java.util.Date().getTime()), queueSize:Option[Int]) {
     def toSave = ( roomId, username, timestamp )
+    def toSaveModel = Queue( Some(-1), roomId, username, Some(timestamp) )
 }
 
 object QueueModel {
@@ -18,9 +20,8 @@ object QueueModel {
   val queue = TableQuery[QueueTable]
 
   def create( params: QueueParams  ) = {
-    val q = queue.map( c => ( c.roomId, c.username,c.timestamp ) ) += params.toSave
+    val q = (queue returning queue) += params.toSaveModel
     db.run( q )
-    this.find(params)
   }
 
   def find( params: QueueParams ) = {
@@ -35,5 +36,10 @@ object QueueModel {
     val q = queue.filter(_.id === params)
     val action = q.delete
     db.run(action)
+  }
+
+  def findByRoom( roomId: Int ): Future[Seq[Queue]] = {
+    val q = queue.filter(_.roomId === roomId).result
+    db.run(q)
   }
 }

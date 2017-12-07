@@ -1,29 +1,41 @@
 package com.cicroomapi.models
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 import slick.driver.PostgresDriver.api._
 import com.cicroomapi.models.tables.Room
 import com.cicroomapi.models.tables.RoomsTable
 import com.cicroomapi.models.tables.TableSchema
 import slick.dbio.DBIOAction._
+
 // my imports
 import com.cicroomapi.models.tables.Room
 
 case class RoomParams(id: Option[Int], description: Option[String], openningTime: Option[String], finalTime: Option[String], password: Option[String], queueSize: Option[Int]) {
   def toSave = ( description, openningTime, finalTime )
-  def getDescription = (description)
-  def toSaveModel = Room( null, description, openningTime, finalTime )
+  def toSaveModel(): Option[Room] = {
+    ( description, openningTime, finalTime ) match {
+      case ( Some(d), Some(o), Some(f) ) => Some(Room( 0, d, o, f ));
+      case _ => None
+    }
+  }
 }
 
 object RoomModel {
   val db = DatabaseConnection.db
   val rooms = TableQuery[RoomsTable]
 
-  def create( params: RoomParams): Future[Int] = {
+  def create( params: RoomParams): Either[String, Future[Room]] = {
   	// val query = rooms returning rooms.map( r => (r.id.?, r.description.?, r.openningTime.?, r.finalTime.?) ) += params.toSaveModel
-    val query = (rooms returning rooms.map(_.id)) += params.toSaveModel
-  	query.statements.foreach(println)
-  	db.run(query)
+    params.toSaveModel match {
+      case Some(room) => {
+        val query = (rooms returning rooms) += room
+        query.statements.foreach(println)
+        Right(db.run(query))
+      }
+      case None => Left("error")
+    }
+  	
   }
 
   def list() = {
