@@ -8,23 +8,18 @@ import _root_.akka.actor.ActorSystem
 
 import com.cicroomapi.models.tables.TableSchema
 
-class ApplicationController(val db: Database, val system: ActorSystem)
+class ApplicationController(implicit val db: Database, implicit val system: ActorSystem)
   extends ScalatraServlet with FutureSupport with JacksonJsonSupport {
 
   protected implicit val jsonFormats: Formats = DefaultFormats
   protected implicit def executor = system.dispatcher
 
   get("/db/drop") {
-    db.run(TableSchema.dropSchemaAction)
-      .map(_ => "ok")
+    db.run(TableSchema.dropSchemaAction).map(_ => "ok")
   }
 
   get("/db/create") {
     db.run(TableSchema.createSchemaAction)
-    Thread.sleep(500)
-    TableSchema.createRoles
-
-      .map(_ => "ok")
   }
 
 }

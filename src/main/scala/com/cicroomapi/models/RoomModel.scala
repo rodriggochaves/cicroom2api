@@ -25,6 +25,16 @@ object RoomModel {
   val db = DatabaseConnection.db
   val rooms = TableQuery[RoomsTable]
 
+  def find( roomId: Int ): Future[Either[String,Room]] = {
+    val q = rooms.filter(_.id === roomId).result
+    db.run(q.map{ Result =>  
+      Result.headOption match {
+        case Some(d) => Right(d);
+        case None => Left("not found")
+      }
+    })
+  }
+
   def create( params: RoomParams): Either[String, Future[Room]] = {
   	// val query = rooms returning rooms.map( r => (r.id.?, r.description.?, r.openningTime.?, r.finalTime.?) ) += params.toSaveModel
     params.toSaveModel match {

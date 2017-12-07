@@ -30,22 +30,13 @@ import _root_.akka.actor.ActorSystem
 
 
 class RoomsController(implicit val db: Database, implicit val system: ActorSystem)
-  extends ScalatraServlet with JacksonJsonSupport with FutureSupport {
+  extends AbstractController with JacksonJsonSupport with FutureSupport {
 
   protected implicit lazy val jsonFormats: Formats = DefaultFormats
   protected implicit def executor = system.dispatcher
 
-  val headers = Map("Access-Control-Allow-Origin" -> "*",
-                    "Access-Control-Allow-Headers" -> "*")
-
   before() {
     contentType = formats("json")
-  }
-
-  options("/*") {
-    response.setHeader("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Origin")
-    response.setHeader("Access-Control-Allow-Origin", "*")
-    response.setHeader("Access-Control-Allow-Methods", "POST, DELETE")
   }
 
   post("/") {
@@ -86,21 +77,6 @@ class RoomsController(implicit val db: Database, implicit val system: ActorSyste
     }
   }
 
-  post("/enter"){
-    val parameters = parsedBody.extract[Map[String, QueueParams]]
-    new AsyncResult{
-      val is: Future[_] = QueueModel.create(parameters("user")).fold(
-        _ => Response("Error"),
-        queue => {
-          QueueModel.findByRoom(queue.roomId).fold(
-            _ => Response("Error"),
-            rooms => Ok(ResponseQueue("ok", queue.id, queue.roomId, rooms.length), headers)
-          )
-        }
-      )
-    }
-  }
-
   get("/:roomId/queues/:id") {
     new AsyncResult {
       val is: Future[_] = {
@@ -120,15 +96,6 @@ class RoomsController(implicit val db: Database, implicit val system: ActorSyste
   delete("/:id") {
     new AsyncResult{
       val is: Future[_] = RoomModel.delete(params("id").toInt).fold(
-        _ => Response("Error"),
-        _ => Ok(Response("ok"), headers)
-      )
-    }
-  }
-
-  delete("/exit/:id") {
-    new AsyncResult{
-      val is: Future[_] = QueueModel.delete(params("id").toInt).fold(
         _ => Response("Error"),
         _ => Ok(Response("ok"), headers)
       )

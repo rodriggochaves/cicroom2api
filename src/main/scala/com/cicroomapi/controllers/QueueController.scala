@@ -6,7 +6,6 @@ import org.scalatra.json._
 import org.json4s.JsonAST._
 import org.json4s.{DefaultFormats, Formats}
 import slick.jdbc.JdbcBackend.Database
-import org.scalatra.CorsSupport
 import org.scalatra.FutureSupport
 
 // async libs
@@ -18,35 +17,56 @@ import dispatch._
 // my imports
 import com.cicroomapi.models.QueueParams
 import com.cicroomapi.models.QueueModel
+import com.cicroomapi.models.tables.Queue
 import com.cicroomapi.models.tables.TableSchema
 import com.cicroomapi.models.tables.QueueTable
+import com.cicroomapi.models.RoomModel
 import slick.driver.PostgresDriver.api._
 import slick.dbio.DBIOAction
 
 class QueueController( implicit val db: Database, implicit val system: ActorSystem ) 
-  extends ScalatraServlet with JacksonJsonSupport with CorsSupport with FutureSupport {
+  extends AbstractController with JacksonJsonSupport with FutureSupport {
 
   protected implicit def executor: ExecutionContext = system.dispatcher
-
   protected implicit lazy val jsonFormats: Formats = DefaultFormats
-  
-  options("/*") {
-    response.setHeader(
-      "Access-Control-Allow-Headers", request.getHeader("Access-Control-Request-Headers")
-    )
-    response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"))
-    response.setHeader("Access-Control-Allow-Methods", request.getHeader("POST"))
-  }
 
-  
   post("/") {
     val parameters = parsedBody.extract[Map[String, QueueParams]]
-    response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin") )
-    new AsyncResult { 
-      val is: Future[_] = QueueModel.create(parameters("queue")).fold(
-        _ => Response("Error"),
-        _ => Response("ok")
+    val queueParams = parameters("queue")
+    new AsyncResult{
+      val is: Future[_] = {
+        createQueue( queueParams )
+      }
+    }
+  }
+
+  delete("/:id") {
+    new AsyncResult{
+      val is: Future[_] = QueueModel.delete(params("id").toInt).fold(
+        _ => NotFound(ErrorResponse("Error", "not found"), headers),
+        _ => Ok(Response("ok"), headers)
       )
     }
   }
+
+  private def findRoom( roomId: Int ) = {
+    RoomModel.find( roomId )
+  }
+
+  private def createQueue( queueParams: QueueParams ) : Future[_] = {
+    findRoom(queueParams.roomId).map( s =>
+      s match {
+        case Right(room) => QueueModel.create(queueParams).map(queue => findAllQueueByRoom(queue))
+        case Left(err) => NotFound(ErrorResponse("Error", err))
+      }
+    )
+  }
+
+  private def findAllQueueByRoom( queue: Queue ) = {
+    QueueModel.findByRoom(queue.roomId).map( queues =>
+      Ok(ResponseQueue("ok", queue.id, queue.roomId, queues.length), headers)
+    )
+  }
+
+
 }

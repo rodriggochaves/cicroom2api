@@ -15,15 +15,9 @@ class ScalatraBootstrap extends LifeCycle {
   implicit val db = DatabaseConnection.db
 
   override def init( context: ServletContext ) {
-
-    context.initParameters(AllowedOriginsKey) = "*"
-    context.initParameters(AllowedMethodsKey) = "*"
-    context.initParameters(AllowedHeadersKey) = "*"
-
-    context.mount(new ApplicationController(db, system), "/api/application/")
+    context.mount(new ApplicationController(), "/api/application/")
     context.mount(new RoomsController(), "/api/rooms/")
-    context.mount(new QueueController(), "/api/queue/")
-
+    context.mount(new QueueController(), "/api/queues/")
   }
 
   override def destroy(context: ServletContext) {
