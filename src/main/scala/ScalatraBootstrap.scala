@@ -11,20 +11,18 @@ import com.cicroomapi.models._
 
 class ScalatraBootstrap extends LifeCycle {
 
-  val system = ActorSystem()
+  implicit val system = ActorSystem()
+  implicit val db = DatabaseConnection.db
 
   override def init( context: ServletContext ) {
-    val db = DatabaseConnection.db
 
     context.initParameters(AllowedOriginsKey) = "*"
     context.initParameters(AllowedMethodsKey) = "*"
     context.initParameters(AllowedHeadersKey) = "*"
 
     context.mount(new ApplicationController(db, system), "/api/application/")
-    context.mount(new UsersController(db, system), "/api/users/")
-    context.mount(new RoomsController(db, system), "/api/rooms/")
-    context.mount(new QueueController(db,system), "/api/queue/")
-    context.mount(new AuthController(system), "/api/auth/")
+    context.mount(new RoomsController(), "/api/rooms/")
+    context.mount(new QueueController(), "/api/queue/")
 
   }
 

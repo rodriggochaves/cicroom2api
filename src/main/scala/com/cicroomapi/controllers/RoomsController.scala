@@ -29,18 +29,20 @@ import slick.dbio.DBIOAction
 import _root_.akka.actor.ActorSystem
 
 
-class RoomsController(val db: Database, val system: ActorSystem)
+class RoomsController(implicit val db: Database, implicit val system: ActorSystem)
   extends ScalatraServlet with JacksonJsonSupport with FutureSupport {
 
   protected implicit lazy val jsonFormats: Formats = DefaultFormats
   protected implicit def executor = system.dispatcher
+
+  val headers = Map("Access-Control-Allow-Origin" -> "*",
+                    "Access-Control-Allow-Headers" -> "*")
 
   before() {
     contentType = formats("json")
   }
 
   options("/*") {
-    println("recebi um OPTION")
     response.setHeader("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Origin")
     response.setHeader("Access-Control-Allow-Origin", "*")
     response.setHeader("Access-Control-Allow-Methods", "POST, DELETE")
@@ -48,51 +50,44 @@ class RoomsController(val db: Database, val system: ActorSystem)
 
   post("/") {
     val parameters = parsedBody.extract[Map[String, RoomParams]]
-    response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin") )
     new AsyncResult { 
       val is: Future[_] = {
         RoomModel.create(parameters("room")) match {
           case Right(x) => {
             x.fold(
               err => ErrorResponse("Error", err),
-              room => ResponseCreatedRoom(room)
+              room => Ok(ResponseCreatedRoom(room), headers)
             )
           }
           case Left(x) => Future{ ErrorResponse("Error", x) }
         }
       }
-
     }
   }
 
   get("/"){
-    response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin") )
     new AsyncResult{
       val is: Future[_] = RoomModel.list().fold(
         err => println(err),
         rooms => {
           val viewRooms = rooms.map( r => ViewRoom(r._1, r._2, r._3) )
-          ResponseRoom("ok", viewRooms )
+          Ok(ResponseRoom("ok", viewRooms), headers)
         }
       )
     }
   }
 
   get("/:id/users"){
-    response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin") )
     new AsyncResult{
       val is: Future[_] = RoomModel.listUsers(params("id").toInt).fold(
         err => println(err),
-        users => ResponseRoomUsers("ok",users)
+        users => Ok(ResponseRoomUsers("ok",users), headers)
       )
     }
   }
 
   post("/enter"){
     val parameters = parsedBody.extract[Map[String, QueueParams]]
-    val origin = request.getHeader("Origin")
-    val headers = Map("Access-Control-Allow-Origin" -> "*",
-                              "Access-Control-Allow-Headers" -> "*") 
     new AsyncResult{
       val is: Future[_] = QueueModel.create(parameters("user")).fold(
         _ => Response("Error"),
@@ -122,22 +117,20 @@ class RoomsController(val db: Database, val system: ActorSystem)
     }
   }
 
-  delete("/:id"){
-    response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin") )
+  delete("/:id") {
     new AsyncResult{
       val is: Future[_] = RoomModel.delete(params("id").toInt).fold(
         _ => Response("Error"),
-        _ => Response("ok")
+        _ => Ok(Response("ok"), headers)
       )
     }
   }
 
-  delete("/exit/:id"){
-    response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin") )
+  delete("/exit/:id") {
     new AsyncResult{
       val is: Future[_] = QueueModel.delete(params("id").toInt).fold(
         _ => Response("Error"),
-        _ => Response("ok")
+        _ => Ok(Response("ok"), headers)
       )
     }
   }

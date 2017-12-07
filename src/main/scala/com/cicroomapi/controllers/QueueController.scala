@@ -23,10 +23,8 @@ import com.cicroomapi.models.tables.QueueTable
 import slick.driver.PostgresDriver.api._
 import slick.dbio.DBIOAction
 
-class QueueController(val db: Database, val system: ActorSystem) extends ScalatraServlet  
-                                                                 with JacksonJsonSupport
-                                                                 with CorsSupport
-                                                                 with FutureSupport {
+class QueueController( implicit val db: Database, implicit val system: ActorSystem ) 
+  extends ScalatraServlet with JacksonJsonSupport with CorsSupport with FutureSupport {
 
   protected implicit def executor: ExecutionContext = system.dispatcher
 
