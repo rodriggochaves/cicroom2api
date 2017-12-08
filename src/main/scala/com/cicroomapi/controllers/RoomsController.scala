@@ -17,7 +17,6 @@ import _root_.akka.actor.ActorSystem
 import dispatch._
 
 // my imports
-import com.cicroomapi.models.UserModel
 import com.cicroomapi.models.RoomParams
 import com.cicroomapi.models.RoomModel
 import com.cicroomapi.models.QueueModel

@@ -20,7 +20,6 @@ case class QueueParams(id: Option[Int],
 
 object QueueModel {
   val db = DatabaseConnection.db
-
   val queue = TableQuery[QueueTable]
 
   def create( params: QueueParams  ) = {
@@ -29,15 +28,12 @@ object QueueModel {
   }
 
   def find( params: QueueParams ) = {
-    // val res = sql""" select queue.room_id,count(queue.username) from queue where queue.room_id = ${params.roomId};""".as[(Option[Int],Option[Int])]
     val query = queue.filter(_.roomId === params.roomId).result 
-    // res.statements.foreach(println)
-    // println(res)
     db.run( query )
   }
 
-  def delete(params: Int) = {
-    val q = queue.filter(_.id === params)
+  def delete( queueId: Int ) = {
+    val q = queue.filter( _.id === queueId )
     val action = q.delete
     db.run(action)
   }
